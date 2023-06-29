@@ -1,3 +1,5 @@
+import lodash from 'lodash';
+
 import {
   InsufficientFundsError,
   SynchronizationFailedError,
@@ -5,16 +7,16 @@ import {
   getBankAccount,
 } from '.';
 
+const initialBalance = 20;
+
 describe('BankAccount', () => {
   test('should create account with initial balance', () => {
-    const initialBalance = 20;
     const bankAccount = getBankAccount(initialBalance);
 
     expect(bankAccount.getBalance()).toBe(initialBalance);
   });
 
   test('should throw InsufficientFundsError error when withdrawing more than balance', () => {
-    const initialBalance = 20;
     const withdrawAmount = 21;
     const bankAccount = getBankAccount(initialBalance);
 
@@ -24,7 +26,6 @@ describe('BankAccount', () => {
   });
 
   test('should throw error when transferring more than balance', () => {
-    const initialBalance = 20;
     const transferAmount = 21;
     const toAccount = getBankAccount(0);
     const bankAccount = getBankAccount(initialBalance);
@@ -35,7 +36,6 @@ describe('BankAccount', () => {
   });
 
   test('should throw error when transferring to the same account', () => {
-    const initialBalance = 20;
     const amount = 21;
     const bankAccount = getBankAccount(initialBalance);
 
@@ -45,7 +45,6 @@ describe('BankAccount', () => {
   });
 
   test('should deposit money', () => {
-    const initialBalance = 20;
     const deposit = 20;
     const bankAccount = getBankAccount(initialBalance);
 
@@ -55,8 +54,7 @@ describe('BankAccount', () => {
   });
 
   test('should withdraw money', () => {
-    const initialBalance = 21;
-    const withdraw = 20;
+    const withdraw = 19;
     const bankAccount = getBankAccount(initialBalance);
 
     bankAccount.withdraw(withdraw);
@@ -76,7 +74,15 @@ describe('BankAccount', () => {
   });
 
   test('fetchBalance should return number in case if request did not failed', async () => {
-    // нужно сделать
+    jest
+      .spyOn(lodash, 'random')
+      .mockReturnValueOnce(initialBalance)
+      .mockReturnValueOnce(1);
+
+    const bankAccount = getBankAccount(initialBalance);
+    const fetchBalance = await bankAccount.fetchBalance();
+
+    expect(typeof fetchBalance).toBe('number');
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
